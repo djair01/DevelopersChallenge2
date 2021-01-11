@@ -1,0 +1,60 @@
+﻿@model StatementModel
+@{
+    ViewData["Title"] = "Nibo - Extrato";
+
+    DateTime initDate = Model.banktranlist.OrderBy(t => t.dtposted).Select(t => t.dtposted).FirstOrDefault();
+    DateTime finDate = Model.banktranlist.OrderByDescending(t => t.dtposted).Select(t => t.dtposted).FirstOrDefault();
+}
+
+<div class="text-left">
+    <h1>Extrato</h1>
+    <h4>Período @(initDate.ToString("dd/MM/yyyy")) and @(finDate.ToString("dd/MM/yyyy"))</h4>
+    <p>
+        <table>
+            <thead>
+                <tr style="border-bottom: 1px solid #1b81a2;">
+                    <th style="padding-right: 15px;">Data</th>
+                    <th style="padding-right: 15px;">Hora</th>
+                    <th style="padding-right: 15px;">Descrição</th>
+                    <th style="padding-right: 15px;">Débito</th>
+                    <th style="padding-right: 15px;"> Crédito</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @{DateTime dataItemAnterior = DateTime.MinValue;
+                    foreach (var item in Model.banktranlist)
+                    {
+                        <tr style="border-bottom: 1px solid Gainsboro;">
+                            <td style="padding-right: 15px;">
+                                @{ if (dataItemAnterior == DateTime.MinValue || dataItemAnterior != item.dtposted)
+                                    {
+                                        dataItemAnterior = item.dtposted;
+                                        @(item.dtposted.ToString("dd/MM/yyyy"))}
+                                    else
+                                    { <label>&nbsp;</label> }
+                                }
+                            </td>
+                            <td style="padding-right: 15px;">@(item.dtposted.ToString("hh:MM:ss"))</td>
+                            <td style="padding-right: 15px;">@(item.memo)</td>
+                            @{var valor = string.Empty;
+                                <td style="padding-right: 15px;">
+                                    <label style="color: red">
+                                        @if (item.trnamt < 0)
+                                        {@(item.trnamt.ToString("C"))}
+                                    </label>
+                                </td>
+                                <td style="padding-right: 15px;">
+                                    <label style="color: green">
+                                        @if (item.trnamt >= 0)
+                                        {@(item.trnamt.ToString("C"))}
+                                    </label>
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </p>
+</div>
